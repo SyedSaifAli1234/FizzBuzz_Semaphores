@@ -7,30 +7,32 @@ sem_t* sem1;
 sem_t* sem2;
 sem_t* sem3;
 sem_t* sem4;
-int i;
+int i, mod;
+int count1=0;
+int count2=0;
+int count3=0;
 
 void* Print_1_100 (void* b){
 
       sem_wait(sem1);
-      for(i = 0; i < 101; i++){
+      for(i = 1; i < 101; i++){
         
-        if(i == 3){ 
+        if((i%3) == 0 && (i%5)!=0){ 
           sem_post(sem2);
           sem_wait(sem1);
         }
-        else if(i == 5){ 
+        else if(i%5 == 0 && (i%3)!=0){ 
           sem_post(sem3);
           sem_wait(sem1);
         }
-        // else if(i%5 == 0 && i%3 == 0){ 
-        //   sem_post(sem4);
-        //   sem_wait(sem1);
-        // }
+        else if(i%3 == 0 && i%5 == 0){ 
+          sem_post(sem4);
+          sem_wait(sem1);
+        }
         else{
           printf("%d\n",i);
         }        
       }
-      //sem_post(sem1);
 
       pthread_exit(0);
     
@@ -38,30 +40,37 @@ void* Print_1_100 (void* b){
 
 void* Print_Fizz (void* b){
 
-    sem_wait(sem2);
-    printf("Fizz\n");
-    sem_post(sem1);
-
+    while(count1!=27){
+      count1=count1+1;
+      sem_wait(sem2);
+      printf("Fizz\n");
+      sem_post(sem1);
+    }
+    
     pthread_exit(0);
 
 }
 
 void *Print_Buzz(void* b){
 
-    sem_wait(sem3);
-    printf("Buzz\n");
-    sem_post(sem1);
-
+    while(count2!=14){
+      count2=count2+1;
+      sem_wait(sem3);
+      printf("Buzz\n");
+      sem_post(sem1);
+    }
     pthread_exit(0);
 
 }
 
 void *Print_Fizz_Buzz(void* b){
 
-    sem_wait(sem4);
-    printf("FizzBuzz");
-    sem_post(sem1);
-
+    while(count3!=6){
+      count3=count3+1;
+      sem_wait(sem4);
+      printf("FizzBuzz\n");
+      sem_post(sem1);
+    }
     pthread_exit(0);
 
 }
@@ -111,15 +120,6 @@ int main(){
   pthread_join(t3, NULL);
   pthread_join(t4, NULL);
 
-  printf("Cant destroy\n");
-
-  //sem_destroy(sem1);                                //Destroying Semaphores
-  //sem_destroy(sem2);
-  //sem_destroy(sem3);
-  //sem_destroy(sem4);
-
-
-  printf("Ending\n");
   return 0;
 
 }
